@@ -17,7 +17,7 @@
 <body>
 <script>
 	//Variáveis do Jogo
-	var canvas, ctx, Altura, Largura, frames = 0, maxPulos = 4, velocidade = 4,	estadoAtual,
+	var canvas, ctx, Altura, Largura, frames = 0, maxPulos = 4, velocidade = 6,	estadoAtual,
 
 	estados = {
 		jogar: 0,
@@ -46,14 +46,16 @@
 		velocidade: 0,
 		forcaDoPulo: 20,
 		qntPulos:0,
+		score: 0,
 
 		atualiza: function() {
 			this.velocidade += this.gravidade;
 			this.y += this.velocidade;
 
-			if (this.y > chao.y - this.altura) {
+			if (this.y > chao.y - this.altura && estadoAtual != estados.perdeu) {
 				this.y = chao.y - this.altura;
 				this.qntPulos = 0;
+				this.velocidade = 0;
 			}
 		},
 
@@ -62,6 +64,12 @@
 				this.velocidade = -this.forcaDoPulo;
 				this.qntPulos++;
 			}
+		},
+
+		reset: function() {
+			this.velocidade = 0;
+			this.y = 0;
+			this.score = 0,
 		},
 
 		desenha: function() {
@@ -78,7 +86,8 @@
 		insere: function() {
 			this._obs.push({
 				x: Largura,
-				largura: 30 + Math.floor(20 * Math.random()),
+				//largura: 30 + Math.floor(20 * Math.random()),
+				largura: 50,
 				altura: 30 + Math.floor(100 * Math.random()),
 				cor: this.cores[Math.floor(5 * Math.random())]
 			});
@@ -97,10 +106,11 @@
 
 				obs.x -= velocidade;
 
-				if (bloco.x < obs.x + obs.largura && bloco.x + bloco.largura >= obs.x && bloco.y + bloco.altura >= chao.y - obs.altura) {
+				if (bloco.x < obs.x + obs.largura && bloco.x + bloco.largura >= obs.x && bloco.y + bloco.altura >= chao.y - obs.altura)
 					estadoAtual = estados.perdeu;
-				}
-
+				
+				else if (obs.x == 0)
+					bloco.score++;
 
 				else if (obs.x <= -obs.largura) {
 					this._obs.splice(i, 1);
@@ -131,9 +141,10 @@
 			estadoAtual = estados.jogando;
 		}
 
-		else if (estadoAtual == estados.perdeu) {
+		else if (estadoAtual == estados.perdeu && bloco.y >= 2 * Altura) {
 			estadoAtual = estados.jogar;
-			bloco.y = 0;
+			obstaculos.limpa();
+			bloco.reset();
 		}
 
 	}
@@ -175,9 +186,6 @@
 
 		if (estadoAtual == estados.jogando) 
 			obstaculos.atualiza();
-
-		else if (estadoAtual == estados.perdeu)
-			obstaculos.limpa();
 	}
 
 	function desenha() {
@@ -203,7 +211,7 @@
 	}
 
 	//Inicializa o Jogo
-	main();		//Vídeo 5  ---  18:16
+	main();		//Vídeo 6  ---  07:56
 </script>
 </body>
 </html>
