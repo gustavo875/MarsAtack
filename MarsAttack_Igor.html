@@ -17,7 +17,13 @@
 <body>
 <script>
 	//Variáveis do Jogo
-	var canvas, ctx, Altura, Largura, frames = 0, maxPulos = 4, velocidade = 6,
+	var canvas, ctx, Altura, Largura, frames = 0, maxPulos = 4, velocidade = 4,	estadoAtual,
+
+	estados = {
+		jogar: 0,
+		jogando: 1,
+		perdeu: 2
+	},
 
 	chao = {
 		y: 550,
@@ -36,9 +42,9 @@
 		altura: 50,
 		largura: 50,
 		cor: "#ff4e4e",
-		gravidade: 1.3,
+		gravidade: 1,
 		velocidade: 0,
-		forcaDoPulo: 18,
+		forcaDoPulo: 20,
 		qntPulos:0,
 
 		atualiza: function() {
@@ -72,12 +78,12 @@
 		insere: function() {
 			this._obs.push({
 				x: Largura,
-				largura: 30 + Math.floor(21 * Math.random()),
-				altura: 30 + Math.floor(120 * Math.random()),
+				largura: 30 + Math.floor(20 * Math.random()),
+				altura: 30 + Math.floor(100 * Math.random()),
 				cor: this.cores[Math.floor(5 * Math.random())]
 			});
 
-			this.tempoInsere = 30 + Math.floor(21 * Math.random());
+			this.tempoInsere = 30 + Math.floor(120 * Math.random());
 		},
 
 		atualiza: function()  {
@@ -87,16 +93,25 @@
 				this.tempoInsere--;
 			
 			for (var i = 0, tam = this._obs.length; i < tam; i++) {
-				var ibs = this._obs[i];
+				var obs = this._obs[i];
 
 				obs.x -= velocidade;
 
-				if (obs.x <= -obs.largura) {
+				if (bloco.x < obs.x + obs.largura && bloco.x + bloco.largura >= obs.x && bloco.y + bloco.altura >= chao.y - obs.altura) {
+					estadoAtual = estados.perdeu;
+				}
+
+
+				else if (obs.x <= -obs.largura) {
 					this._obs.splice(i, 1);
 					tam--;
 					i--;
 				}
 			}
+		},
+
+		limpa: function() {
+			this._obs = [];
 		},
 
 		desenha: function() {
@@ -109,7 +124,18 @@
 	};
 
 	function clique(event) {
-		bloco.pula();
+		if (estadoAtual == estados.jogando)
+			bloco.pula();
+
+		else if (estadoAtual == estados.jogar) {
+			estadoAtual = estados.jogando;
+		}
+
+		else if (estadoAtual == estados.perdeu) {
+			estadoAtual = estados.jogar;
+			bloco.y = 0;
+		}
+
 	}
 	
 	function main() {
@@ -131,6 +157,7 @@
 
 		document.addEventListener("mousedown", clique);
 
+		estadoAtual = estados.jogar;
 		roda();
 	}
 	
@@ -145,20 +172,38 @@
 		frames++;
 
 		bloco.atualiza();
-		obstaculos.atualiza();
+
+		if (estadoAtual == estados.jogando) 
+			obstaculos.atualiza();
+
+		else if (estadoAtual == estados.perdeu)
+			obstaculos.limpa();
 	}
 
 	function desenha() {
 		ctx.fillStyle = "#50beff";
 		ctx.fillRect(0, 0, Largura, Altura);
 
+		if (estadoAtual == estados.jogar) {
+			ctx.fillStyle = "green";
+			ctx.fillRect(Largura / 2 - 50, Altura / 2 - 50, 100, 100);
+		}
+		
+		else if (estadoAtual == estados.perdeu) {
+			ctx.fillStyle = "red";
+			ctx.fillRect(Largura / 2 - 50, Altura / 2 - 50, 100, 100);
+		}
+
+		else if (estadoAtual == estados.jogando)
+			obstaculos.desenha();
+		
+
 		chao.desenha();
-		obstaculos.desenha();
 		bloco.desenha();
 	}
 
 	//Inicializa o Jogo
-	main();
+	main();		//Vídeo 5  ---  18:16
 </script>
 </body>
 </html>
