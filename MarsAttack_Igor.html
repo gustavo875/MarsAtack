@@ -3,6 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<title>Mars Attack</title>
+	<script src="Sprite.js"></script>
 	<style>
 		canvas {
 			position: absolute;
@@ -17,7 +18,7 @@
 <body>
 <script>
 	// Variáveis do Jogo
-	var canvas, ctx, Altura, Largura, frames = 0, maxPulos = 4, velocidade = 6,	estadoAtual, record,
+	var canvas, ctx, Altura, Largura, maxPulos = 4, velocidade = 6,	estadoAtual, record, img,
 
 	estados = {
 		jogar: 0,
@@ -27,30 +28,37 @@
 
 	chao = {
 		y: 550,
+		x: 0,
 		altura: 50,
-		cor: "#ffdf70",
+
+		atualiza: function() {
+			this.x -= velocidade;
+			if (this.x <= -30)
+				this.x = 0;
+		},
 
 		desenha: function() {
-			ctx.fillStyle = this.cor;
-			ctx.fillRect(0, this.y, Largura, this.altura);
+			SpriteChao.desenha(this.x, this.y);
+			SpriteChao.desenha(this.x + SpriteChao.largura, this.y);
 		}
-	};
+	},
 
 	bloco = {
 		x: 50,
 		y: 0,
-		altura: 50,
-		largura: 50,
-		cor: "#ff4e4e",
+		altura: SpriteBoneco.altura,
+		largura: SpriteBoneco.largura,
 		gravidade: 1,
 		velocidade: 0,
 		forcaDoPulo: 20,
 		qntPulos: 0,
 		score: 0,
+		rotacao: 0,
 
 		atualiza: function() {
 			this.velocidade += this.gravidade;
 			this.y += this.velocidade;
+			this.rotacao += Math.PI / 180 * velocidade;
 
 			if (this.y > chao.y - this.altura && estadoAtual != estados.perdeu) {
 				this.y = chao.y - this.altura;
@@ -79,8 +87,13 @@
 		},
 
 		desenha: function() {
-			ctx.fillStyle = this.cor;
-			ctx.fillRect(this.x, this.y, this.largura, this.altura);
+			ctx.save();
+			// Operação Rotação
+			ctx.translate(this.x + this.largura / 2, this.y + this.altura / 2);
+			ctx.rotate(this.rotacao);
+			SpriteBoneco.desenha(-this.largura / 2, -this.altura / 2);
+
+			ctx.restore();
 		}
 	},
 
@@ -180,6 +193,9 @@
 		if (record == null)
 			record = 0;
 
+		img = new Image();
+		img.src = "Imagens/Sheet.png";
+
 		roda();
 	}
 	
@@ -191,69 +207,47 @@
 	}
 	
 	function atualiza() {
-		frames++;
-
-		bloco.atualiza();
-
 		if (estadoAtual == estados.jogando) 
 			obstaculos.atualiza();
+
+		chao.atualiza();
+		bloco.atualiza();
 	}
 
 	function desenha() {
-		ctx.fillStyle = "#50beff";
-		ctx.fillRect(0, 0, Largura, Altura);
+		bg.desenha(0, 0);
 
 		ctx.fillStyle = "#fff";
 		ctx.font = "50px Arial";
 		ctx.fillText(bloco.score, 30, 68);
 
-		if (estadoAtual == estados.jogar) {
-			ctx.fillStyle = "green";
-			ctx.fillRect(Largura / 2 - 50, Altura / 2 - 50, 100, 100);
-		}
-		
-		else if (estadoAtual == estados.perdeu) {
-			ctx.fillStyle = "red";
-			ctx.fillRect(Largura / 2 - 50, Altura / 2 - 50, 100, 100);
-
-			ctx.save();
-			ctx.translate(Largura / 2, Altura / 2);
-			ctx.fillStyle = "#fff";
-			
-			if (bloco.score > record)
-				ctx.fillText("Novo Record!", -150, -65);
-
-			else if (record < 10)
-				ctx.fillText("Record " + record, -99, -65);
-			
-			else if (record >= 10 && record < 100)
-				ctx.fillText("Record " + record, -112, -65);
-
-			else
-				ctx.fillText("Record " + record, -125, -65);
-			
-			if (bloco.score < 10)
-				ctx.fillText(bloco.score, -13, 19);
-
-			else if (bloco.score >= 10 && bloco.score < 100)
-				ctx.fillText(bloco.score, -26, 19);
-
-			else
-				ctx.fillText(bloco.score, -39, 19);
-			
-			ctx.restore();
-		}
-
-		else if (estadoAtual == estados.jogando)
+		if (estadoAtual == estados.jogando) 
 			obstaculos.desenha();
 		
-
 		chao.desenha();
 		bloco.desenha();
+		
+		if (estadoAtual == estados.jogar)
+			jogar.desenha(Largura / 2 - jogar.largura / 2, Altura / 2 - jogar.altura / 2);
+
+		if (estadoAtual == estados.perdeu) {
+			perdeu.desenha(Largura / 2 - perdeu.largura / 2, Altura / 2 - perdeu.altura / 2);
+			ctx.fillStyle = "#fff";
+
+			if (bloco.score > record) {
+				novo.desenha(Largura / 2 - 180, Altura / 2 + 30);
+				ctx.fillText(bloco.score, 420, 485);
+			}
+			else {
+				ctx.fillText(bloco.score, 375, 400);
+				ctx.fillText(record, 415, 485);
+			}
+		}
 	}
 
 	//Inicializa o Jogo
-	main();		//Vídeo 8  ---  00:00
+	main();		  
+				//Vídeo 10 - Vidas
 </script>
 </body>
 </html>
