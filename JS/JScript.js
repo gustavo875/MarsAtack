@@ -6,6 +6,8 @@ var frames;
 var contBombas, painelContBombas, velB, tmpCriaBomba;
 var bombasTotal;
 var vidaPlaneta;
+var ie, isom;  //Indice Explosão - Indice Som
+
 
 function teclaDw() {
 	var tecla = event.keyCode;
@@ -113,6 +115,51 @@ function colisaoTiroBomba(tiro){
 	}
 }
 
+function criaExplosao(tipo, x, y) {   //Tipo 1=Ar, 2=Terra
+	var explosao = document.createElement("div");
+	var img = document.createElement("img");
+	var som = document.createElement("audio");
+	//Atributos para Div
+	var att1 = document.createAttribute("class");
+	var att2 = document.createAttribute("style");
+	var att3 = document.createAttribute("id");
+	//Atributos para Imagem
+	var att4 = document.createAttribute("src");
+	//Atributos para Audio
+	var att5 = document.createAttribute("src");
+	var att6 = document.createAttribute("id");
+
+	att3.value = "explosao" + ie;
+	if (tipo==1) {
+		att1.value = "explosaoAr";
+		att2.value = "top:"+y+"px; left:"+x+"px";
+		att4.value = "Imagens/Explosao_Ar.gif";
+	}
+	else {
+		att1.value = "explosaoChao";
+		att2.value = "top:"+(tamTelaH - 57)+"px; left:"+(x - 17)+"px";
+		att4.value = "Imagens/Explosao_Chao.gif";
+	}
+	att5.value = "Imagens/Explosao.mp3";
+	att6.value = "som" + isom;
+	explosao.setAttributeNode(att1);
+	explosao.setAttributeNode(att2);
+	explosao.setAttributeNode(att3);
+	img.setAttributeNode(att4);
+	som.setAttributeNode(att5);
+	som.setAttributeNode(att6);
+	explosao.appendChild(img);
+	explosao.appendChild(som);
+	document.body.appendChild(explosao);
+	document.getElementById("som"+isom).play();
+	ie++;
+	isom++;
+	
+	t.setAttributeNode(att1);
+	t.setAttributeNode(att2);
+	document.body.appendChild(t); 
+}
+
 function controlaJogador() {
 	pjy += diryJ * velJ;
 	pjx += dirxJ * velJ;
@@ -152,6 +199,9 @@ function inicia() {
 
 	//Controle Planeta
 	vidaPlaneta = 300;
+
+	//Controles Explosão
+	ie = isom = 0;
 
 	gameLoop();
 }
