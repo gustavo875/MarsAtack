@@ -87,8 +87,27 @@ function controleTiros() {
 			var pt = tiros[i].offsetTop;
 			pt -= velT;
 			tiros[i].style.top = pt+"px";
+			colisaoTiroBomba(tiros[i]);
 			if (pt < 0) {
 				tiros[i].remove();
+			}
+		}
+	}
+}
+
+function colisaoTiroBomba(tiro){
+	var tam = bombasTotal.length;
+	for (var i = 0; i < tam; i++) {
+		if (bombasTotal[i]) {
+			if ((
+				(tiro.offsetTop <= (bombasTotal[i].offsetTop + 40)) && //Cima Tiro com Baixo Bomba
+				((tiro.offsetTop + 6) >= (bombasTotal[i].offsetTop))   //Baixo Tiro com Cima Bomba
+				) &&(
+				(tiro.offsetLeft <= (bombasTotal[i].offsetLeft + 24)) && //Esquera Tiro com Direita Bomba
+				((tiro.offsetLeft + 6) >= (bombasTotal[i].offsetLeft))   //Direita Tiro com Esquerda Bomba
+				)) {
+				bombasTotal[i].remove();
+				tiro.remove();
 			}
 		}
 	}
