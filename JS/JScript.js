@@ -5,8 +5,9 @@ var jogo;
 var frames;
 var contBombas, painelContBombas, velB, tmpCriaBomba;
 var bombasTotal;
-var vidaPlaneta;
-var ie, isom;  //Indice Explosão - Indice Som
+var vidaPlaneta, barraPlaneta;
+var ie;  //Indice Explosão
+var telaMsg;
 
 
 function teclaDw() {
@@ -50,7 +51,7 @@ function criaBomba() {
 		bomba.setAttributeNode(att1);
 		bomba.setAttributeNode(att2);
 		document.body.appendChild(bomba);
-		//contBombas == ;
+		contBombas--;
 	}
 }
 
@@ -63,7 +64,8 @@ function controlaBomba() {
 			pi += velB;
 			bombasTotal[i].style.top = pi+"px";
 			if (pi > tamTelaH) {
-				vidaPlaneta = -10;
+				vidaPlaneta -= 10;
+				criaExplosao(2, bombasTotal[i].offsetLeft, null);  //Tipo 2=Terra
 				bombasTotal[i].remove();
 			}
 		}
@@ -104,10 +106,11 @@ function colisaoTiroBomba(tiro){
 			if ((
 				(tiro.offsetTop <= (bombasTotal[i].offsetTop + 40)) && //Cima Tiro com Baixo Bomba
 				((tiro.offsetTop + 6) >= (bombasTotal[i].offsetTop))   //Baixo Tiro com Cima Bomba
-				) &&(
+				) && (
 				(tiro.offsetLeft <= (bombasTotal[i].offsetLeft + 24)) && //Esquera Tiro com Direita Bomba
 				((tiro.offsetLeft + 6) >= (bombasTotal[i].offsetLeft))   //Direita Tiro com Esquerda Bomba
 				)) {
+				criaExplosao(1, bombasTotal[i].offsetLeft -25, bombasTotal[i].offsetTop);	//Tipo 1=Ar
 				bombasTotal[i].remove();
 				tiro.remove();
 			}
@@ -116,48 +119,37 @@ function colisaoTiroBomba(tiro){
 }
 
 function criaExplosao(tipo, x, y) {   //Tipo 1=Ar, 2=Terra
+	if (document.getElementById("explosao" + (ie - 4))) {
+		document.getElementById("explosao" + (ie - 4)).remove();
+	}
 	var explosao = document.createElement("div");
 	var img = document.createElement("img");
-	var som = document.createElement("audio");
 	//Atributos para Div
 	var att1 = document.createAttribute("class");
 	var att2 = document.createAttribute("style");
 	var att3 = document.createAttribute("id");
 	//Atributos para Imagem
 	var att4 = document.createAttribute("src");
-	//Atributos para Audio
-	var att5 = document.createAttribute("src");
-	var att6 = document.createAttribute("id");
-
+	
 	att3.value = "explosao" + ie;
 	if (tipo==1) {
 		att1.value = "explosaoAr";
 		att2.value = "top:"+y+"px; left:"+x+"px";
-		att4.value = "Imagens/Explosao_Ar.gif";
+		att4.value = "Imagens/Explosao_Ar.gif?" + new Date();
 	}
 	else {
 		att1.value = "explosaoChao";
 		att2.value = "top:"+(tamTelaH - 57)+"px; left:"+(x - 17)+"px";
-		att4.value = "Imagens/Explosao_Chao.gif";
+		att4.value = "Imagens/Explosao_Chao.gif?" + new Date();
 	}
-	att5.value = "Imagens/Explosao.mp3";
-	att6.value = "som" + isom;
 	explosao.setAttributeNode(att1);
 	explosao.setAttributeNode(att2);
 	explosao.setAttributeNode(att3);
 	img.setAttributeNode(att4);
-	som.setAttributeNode(att5);
-	som.setAttributeNode(att6);
 	explosao.appendChild(img);
-	explosao.appendChild(som);
 	document.body.appendChild(explosao);
-	document.getElementById("som"+isom).play();
-	ie++;
-	isom++;
 	
-	t.setAttributeNode(att1);
-	t.setAttributeNode(att2);
-	document.body.appendChild(t); 
+	ie++;
 }
 
 function controlaJogador() {
@@ -167,17 +159,57 @@ function controlaJogador() {
 	jog.style.left = pjx+"px";
 }
 
+function gerenciaGame() {
+	barraPlaneta.style.width = vidaPlaneta + "px";
+	if (contBombas <= 0) {
+		jogo = false;
+		clearInterval(tmpCriaBomba);
+		telaMsg.style.backgroundImage = "url('Imagens/Vitoria.jpg')";
+		telaMsg.style.display = "block";
+	}
+	if (vidaPlaneta <= 0) {
+		jogo = false;
+		clearInterval(tmpCriaBomba);
+		telaMsg.style.backgroundImage = "url('Imagens/Derrota.jpg')";
+		telaMsg.style.display = "block";
+	}
+}
+
 function gameLoop() {
 	if (jogo) {
 		controlaJogador();
 		controleTiros();
 		controlaBomba();
 	}
+	gerenciaGame();
 	frames = requestAnimationFrame(gameLoop);
 }
 
-function inicia() {
+function reinicia() {
+	bombasTotal = document.getElementsByClassName("bomba");
+	var tam = bombasTotal.length;
+	for(var i = 0; i < tam; i++) {
+		if (bombasTotal[i]) {
+			bombasTotal[i].remove();
+		}
+	}
+	telaMsg.style.display = "none";
+	clearInterval(tmpCriaBomba);
+	cancelAnimationFrame(frames);
+	vidaPlaneta = 300;
+	pjx = tamTelaW / 2;
+	pjy = tamTelaH / 2;
+	jog.style.top = pjy  + "px";
+	jog.style.left = pjy + "px";
+	contBombas = 150;
 	jogo = true;
+	tmpCriaBomba = setInterval(criaBomba, 1700);
+
+	gameLoop();
+}
+
+function inicia() {
+	jogo = false;
 	//Ini tela
 	tamTelaH = window.innerHeight;
 	tamTelaW = window.innerHeight;
@@ -192,18 +224,22 @@ function inicia() {
 	jog.style.left = pjx+"px";
 
 	//Controle Bombas
-	clearInterval(tmpCriaBomba);
 	contBombas = 150;
 	velB = 3;
-	tmpCriaBomba = setInterval(criaBomba, 1700);
 
 	//Controle Planeta
 	vidaPlaneta = 300;
+	barraPlaneta = document.getElementById("BarraPlaneta");
+	barraPlaneta.style.width = vidaPlaneta + "px";
 
 	//Controles Explosão
-	ie = isom = 0;
+	ie = 0;
 
-	gameLoop();
+	//Telas
+	telaMsg = document.getElementById("TelaMsg");
+	telaMsg.style.backgroundImage = "url(Imagens/Intro.jpg)";
+	telaMsg.style.display = "block";
+	document.getElementById("BtnJogar").addEventListener("click", reinicia);
 }
 
 window.addEventListener("load", inicia);
