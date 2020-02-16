@@ -46,10 +46,13 @@ function criaBomba() {
 		var bomba = document.createElement("div");
 		var att1 = document.createAttribute("class");
 		var att2 = document.createAttribute("style");
+		var att3 = document.createAttribute("id");
 		att1.value = "bomba";
 		att2.value = "top:"+y+"px; left:"+x+"px";
+		att3.value = "bomba" + contBombas;
 		bomba.setAttributeNode(att1);
 		bomba.setAttributeNode(att2);
+		bomba.setAttributeNode(att3);
 		document.body.appendChild(bomba);
 		contBombas--;
 	}
@@ -119,9 +122,6 @@ function colisaoTiroBomba(tiro){
 }
 
 function criaExplosao(tipo, x, y) {   //Tipo 1=Ar, 2=Terra
-	if (document.getElementById("explosao" + (ie - 4))) {
-		document.getElementById("explosao" + (ie - 4)).remove();
-	}
 	var explosao = document.createElement("div");
 	var img = document.createElement("img");
 	//Atributos para Div
@@ -148,7 +148,8 @@ function criaExplosao(tipo, x, y) {   //Tipo 1=Ar, 2=Terra
 	img.setAttributeNode(att4);
 	explosao.appendChild(img);
 	document.body.appendChild(explosao);
-	
+	setTimeout(function() {document.body.appendChild(explosao).remove();}, 1500);	//Remove a Explosão depois de 1,5 segundos
+
 	ie++;
 }
 
@@ -186,11 +187,9 @@ function gameLoop() {
 }
 
 function reinicia() {
-	bombasTotal = document.getElementsByClassName("bomba");
-	var tam = bombasTotal.length;
-	for(var i = 0; i < tam; i++) {
-		if (bombasTotal[i]) {
-			bombasTotal[i].remove();
+	for (var i = contBombas; i < contBombas + 5; i++) {
+		if (document.getElementById("bomba" + i)) {
+			document.getElementById("bomba" + i).remove();
 		}
 	}
 	telaMsg.style.display = "none";
@@ -204,6 +203,7 @@ function reinicia() {
 	contBombas = 150;
 	jogo = true;
 	tmpCriaBomba = setInterval(criaBomba, 1700);
+	ie = 0;
 
 	gameLoop();
 }
@@ -226,15 +226,13 @@ function inicia() {
 	//Controle Bombas
 	contBombas = 150;
 	velB = 3;
+	ie = 0;
 
 	//Controle Planeta
 	vidaPlaneta = 300;
 	barraPlaneta = document.getElementById("BarraPlaneta");
 	barraPlaneta.style.width = vidaPlaneta + "px";
-
-	//Controles Explosão
-	ie = 0;
-
+	
 	//Telas
 	telaMsg = document.getElementById("TelaMsg");
 	telaMsg.style.backgroundImage = "url(Imagens/Intro.jpg)";
