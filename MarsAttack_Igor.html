@@ -105,13 +105,20 @@
 		insere: function() {
 			this._obs.push({
 				x: Largura,
-				//largura: 30 + Math.floor(20 * Math.random()),
 				largura: 50,
 				altura: 30 + Math.floor(100 * Math.random()),
 				cor: this.cores[Math.floor(5 * Math.random())]
 			});
 
-			this.tempoInsere = 30 + Math.floor(120 * Math.random());
+			if ((bloco.score >= 0) && (bloco.score <= 20)) {
+				this.tempoInsere = 30 + Math.floor(120 * Math.random());
+			};
+			if ((bloco.score > 20) && (bloco.score <= 40)) {
+				this.tempoInsere = 30 + Math.floor(70 * Math.random());
+			};
+			if ((bloco.score > 40) && (bloco.score <= 60)) {
+				this.tempoInsere = 30 + Math.floor(20 * Math.random());
+			};
 		},
 
 		atualiza: function()  {
@@ -247,7 +254,6 @@
 
 	//Inicializa o Jogo
 	main();		  
-				//Vídeo 10 - Vidas
 </script>
 </body>
 </html>

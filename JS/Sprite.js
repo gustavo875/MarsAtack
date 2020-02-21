@@ -15,5 +15,4 @@ SpriteBoneco = new Sprite(618, 16, 87, 87),
 perdeu = new Sprite(603, 478, 397, 453),
 jogar = new Sprite(603, 127, 397, 347),
 novo = new Sprite(68, 721, 287, 93),
-SpriteRecord = new Sprite(28, 879, 441, 95),
 SpriteChao = new Sprite(0, 604, 600 ,54);

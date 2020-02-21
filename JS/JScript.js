@@ -42,7 +42,7 @@ function teclaUp() {
 function criaBomba() {
 	if (jogo) {
 		var y = 0;
-		var x = Math.random() * tamTelaW;
+		var x = ((Math.random() * 750) + 283);		//Ajustar Posição Bomba
 		var bomba = document.createElement("div");
 		var att1 = document.createAttribute("class");
 		var att2 = document.createAttribute("style");
@@ -59,6 +59,13 @@ function criaBomba() {
 }
 
 function controlaBomba() {
+	if (contBombas <= 100) {
+		if (contBombas > 50) {
+			velB = 4.5;
+		}else {
+			velB = 6;
+		}
+	}
 	bombasTotal = document.getElementsByClassName("bomba");
 	var tam = bombasTotal.length;
 	for (var i = 0; i < tam; i++) {
@@ -76,6 +83,8 @@ function controlaBomba() {
 }
 
 function atira(x, y) {
+	x += 283;			//Ajustar tiro com a nave
+	y += 25;			//Ajustar tiro com a nave
 	var t = document.createElement("div");
 	var att1 = document.createAttribute("class");
 	var att2 = document.createAttribute("style");
@@ -154,14 +163,28 @@ function criaExplosao(tipo, x, y) {   //Tipo 1=Ar, 2=Terra
 }
 
 function controlaJogador() {
-	pjy += diryJ * velJ;
+	if (pjx < 0) {
+		dirxJ = 1;
+	}
+	if (pjx > 760) {
+		dirxJ = -1;
+	}
+	if (pjy < 0) {
+		diryJ = 1;
+	}
+	if (pjy > 560) {
+		diryJ = -1;
+	}
+
 	pjx += dirxJ * velJ;
+	pjy += diryJ * velJ;
 	jog.style.top = pjy+"px";
 	jog.style.left = pjx+"px";
 }
 
 function gerenciaGame() {
 	barraPlaneta.style.width = vidaPlaneta + "px";
+	
 	if (contBombas <= 0) {
 		jogo = false;
 		clearInterval(tmpCriaBomba);
@@ -200,10 +223,11 @@ function reinicia() {
 	pjy = tamTelaH / 2;
 	jog.style.top = pjy  + "px";
 	jog.style.left = pjy + "px";
+	tmpCriaBomba = setInterval(criaBomba, 1500);
 	contBombas = 150;
-	jogo = true;
-	tmpCriaBomba = setInterval(criaBomba, 1700);
+	velB = 3;
 	ie = 0;
+	jogo = true;
 
 	gameLoop();
 }
@@ -211,14 +235,14 @@ function reinicia() {
 function inicia() {
 	jogo = false;
 	//Ini tela
-	tamTelaH = window.innerHeight;
-	tamTelaW = window.innerHeight;
+	tamTelaH = 600;//window.innerHeight;
+	tamTelaW = 800;//window.innerHeight;
 
 	//Ini Jogador
 	dirxJ = diryJ = 0;
 	pjx = tamTelaW / 2;
 	pjy = tamTelaH / 2;
-	velJ = velT = 5;
+	velJ = velT = 6;
 	jog = document.getElementById("NaveJog");
 	jog.style.top = pjy+"px";
 	jog.style.left = pjx+"px";
@@ -235,7 +259,7 @@ function inicia() {
 	
 	//Telas
 	telaMsg = document.getElementById("TelaMsg");
-	telaMsg.style.backgroundImage = "url(Imagens/Intro.jpg)";
+	telaMsg.style.backgroundImage = "url(Imagens/Intro1.jpg)";  //Removido tela Intro
 	telaMsg.style.display = "block";
 	document.getElementById("BtnJogar").addEventListener("click", reinicia);
 }

@@ -1,7 +1,14 @@
-body{
-	overflow-x: hidden;
-	overflow-y: hidden;
-	background-color: #fff;
+#Fundo{
+	width: 800px;
+	height: 600px;
+	background-image: url("Imagens/Espaco2.jpg");
+	position: absolute;
+	border: 30px solid #000;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	margin: auto;
 }
 
 .navJog{
@@ -25,7 +32,7 @@ body{
 	border: 2px solid #000;
 	width: 300px;
 	height: 20px;
-	background-color: #fff;
+	background-color: ;
 }
 
 #BarraPlaneta{
